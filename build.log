@@ -1,0 +1,41 @@
+
+> nextjs@0.1.0 build
+> next build
+
+   Creating an optimized production build...
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Browserslist: caniuse-lite is outdated. Please run:
+  npx browserslist@latest --update-db
+  Why you should do it regularly: https://github.com/browserslist/browserslist#browsers-data-updating
+ ✓ Compiled successfully
+   Skipping linting
+   Checking validity of types...
+   Collecting page data...
+   Generating static pages (0/4)...
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:9091". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+   Generating static pages (1/4)
+
+   Generating static pages (2/4)
+
+   Generating static pages (3/4)
+
+
+ ⚠ metadata.metadataBase is not set for resolving social open graph or twitter images, using "http://localhost:9091". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ✓ Generating static pages (4/4)
+   Finalizing page optimization...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    155 kB          244 kB
+└ ○ /_not-found                          885 B          80.5 kB
++ First Load JS shared by all            79.6 kB
+  ├ chunks/864-55ffb631c652103e.js       26.5 kB
+  ├ chunks/fd9d1056-9bc591f40a60a661.js  51.1 kB
+  ├ chunks/main-app-bd125250a444ad63.js  227 B
+  └ chunks/webpack-acc1b71da109ddef.js   1.82 kB
+
+
+○  (Static)  automatically rendered as static HTML (uses no initial props)
+
