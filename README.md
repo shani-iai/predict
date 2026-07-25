@@ -29,7 +29,7 @@ The application helps factories prevent equipment failures, reduce unplanned dow
 ## Live Demo
 
 Access the live application:
-https://predict-ai-zeta.vercel.app/
+https://predict-coral-beta.vercel.app/
 
 How to test:
 1. Download the sample CSV from the project
