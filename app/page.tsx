@@ -161,31 +161,11 @@ export default function Home() {
     setAiExplanation('');
     setRecommendations([]);
     try {
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-      // If Supabase URL / ANON key are not configured (local/dev), show a deterministic fallback
-      if (!supabaseUrl || !supabaseKey) {
-        const fallback = `AI analysis is unavailable because the Supabase URL or ANON key is not configured. Showing a deterministic fallback explanation for ${machineName}.`;
-        setAiExplanation(
-          `Fallback: ${fallback}\nMachine ${machineName} evaluated as ${prediction.riskLevel} (score ${prediction.riskScore}/100). Review sensors with the highest deviation and recent anomalous readings.`
-        );
-        setRecommendations([
-          'Inspect sensors with the highest deviation from baseline values.',
-          'Schedule a routine inspection for any machine flagged Medium or High risk.',
-          'Review recent maintenance logs for recurring issues.',
-        ]);
-        toast('AI analysis unavailable; showing fallback explanation.');
-        return;
-      }
-
-      const apiUrl = `${supabaseUrl}/functions/v1/predict-ai`;
-      const res = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${supabaseKey}`,
-        },
+     const res = await fetch("/api/analyze", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
         body: JSON.stringify({
           machineName,
           metrics: prediction.metrics,
