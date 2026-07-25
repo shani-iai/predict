@@ -1,36 +1,76 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export async function analyzeSensorData(sensorData: any) {
+export async function analyzeSensorData(data: any) {
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (!apiKey) {
+    return {
+      explanation: "Gemini API key is not configured.",
+      recommendations: [
+        "Inspect sensors with the highest deviation.",
+        "Review maintenance schedule.",
+        "Perform preventive maintenance."
+      ],
+    };
+  }
+
   try {
-    const key = process.env.GEMINI_API_KEY;
-    if (!key) {
-      console.error('No API key found');
-      throw new Error('Missing API key');
-    }
+    const genAI = new GoogleGenerativeAI(apiKey);
 
-    const genAI = new GoogleGenerativeAI(key);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.0-flash",
+    });
 
-    const message = `Equipment sensor analysis. Average readings: ${sensorData.avgSensor1}, ${sensorData.avgSensor2}, ${sensorData.avgSensor3}. 
-    Respond ONLY with valid JSON: {"assessment":"brief analysis","estimatedRUL":2000,"riskLevel":"Low"}`;
+    const prompt = `
+You are an industrial predictive maintenance engineer.
 
-    const result = await model.generateContent(message);
-    const responseText = result.response.text();
-    
-    // Extract JSON
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('No JSON in response');
-    
-    const parsed = JSON.parse(jsonMatch[0]);
+Machine Name: ${data.machineName}
+
+Risk Level: ${data.riskLevel}
+
+Risk Score: ${data.riskScore}
+
+Metrics:
+${JSON.stringify(data.metrics, null, 2)}
+
+Sensor Summary:
+${JSON.stringify(data.sensorSummary, null, 2)}
+
+Return ONLY valid JSON in this format:
+
+{
+  "explanation":"3-5 sentence explanation",
+  "recommendations":[
+    "Recommendation 1",
+    "Recommendation 2",
+    "Recommendation 3"
+  ]
+}
+`;
+
+    const result = await model.generateContent(prompt);
+
+    const text = result.response.text();
+
+    const cleaned = text
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
+
+    const parsed = JSON.parse(cleaned);
+
+    return parsed;
+  } catch (error) {
+    console.error(error);
 
     return {
-      analysis: parsed.assessment || 'Analysis complete',
-      healthScore: parsed.riskLevel === 'Low' ? 85 : parsed.riskLevel === 'Medium' ? 60 : 30,
-      rul: parsed.estimatedRUL || 1000,
-      riskLevel: parsed.riskLevel || 'Low',
+      explanation:
+        "Machine shows abnormal sensor behaviour. Preventive maintenance is recommended.",
+      recommendations: [
+        "Inspect sensors with the highest deviation.",
+        "Check bearings and lubrication.",
+        "Review maintenance history.",
+      ],
     };
-  } catch (error) {
-    console.error('API Error:', error);
-    throw error;
   }
 }

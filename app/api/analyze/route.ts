@@ -1,48 +1,50 @@
-import { NextRequest, NextResponse } from 'next/server';
-import Papa from 'papaparse';
-import { analyzeCsvData } from '../../lib/analyzer';
-import { analyzeSensorData } from '../../lib/gemini';
+import { NextRequest, NextResponse } from "next/server";
+import { analyzeSensorData } from "@/lib/gemini";
 
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const body = await req.json();
 
-    if (!file) {
-      return NextResponse.json({ error: 'No file' }, { status: 400 });
-    }
+    const {
+      machineName,
+      metrics,
+      sensorSummary,
+      riskLevel,
+      riskScore,
+      recordCount,
+    } = body;
 
-    const text = await file.text();
-    const parsed = Papa.parse(text, { header: true, dynamicTyping: true, skipEmptyLines: true });
-
-    if (parsed.errors.length > 0) {
-      return NextResponse.json({ error: 'CSV error', details: parsed.errors }, { status: 400 });
-    }
-
-    const data = parsed.data as any[];
-    const analysis = analyzeCsvData(data);
-
-    // Get AI analysis
-    let aiAnalysis;
-    try {
-      aiAnalysis = await analyzeSensorData(analysis);
-      console.log('AI analysis success:', aiAnalysis);
-    } catch (aiError) {
-      console.error('AI failed, using fallback:', aiError);
-      aiAnalysis = {
-        analysis: 'Analysis complete using predictive model.',
-        healthScore: 70,
-        rul: 1500,
-        riskLevel: 'Medium',
-      };
-    }
+    const result = await analyzeSensorData({
+      machineName,
+      metrics,
+      sensorSummary,
+      riskLevel,
+      riskScore,
+      recordCount,
+    });
 
     return NextResponse.json({
-      success: true,
-      data: { ...analysis, ...aiAnalysis },
+      explanation:
+        result.explanation ||
+        `Machine ${machineName} analyzed successfully.`,
+      recommendations:
+        result.recommendations || [
+          "Inspect sensors with the highest deviation.",
+          "Review maintenance schedule.",
+          "Perform preventive maintenance.",
+        ],
     });
   } catch (error) {
-    console.error('Upload error:', error);
-    return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
+    console.error(error);
+
+    return NextResponse.json({
+      explanation:
+        "AI service is unavailable. A deterministic analysis has been generated instead.",
+      recommendations: [
+        "Inspect sensors with the highest deviation.",
+        "Review recent maintenance logs.",
+        "Schedule preventive maintenance.",
+      ],
+    });
   }
 }
