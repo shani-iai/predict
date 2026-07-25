@@ -37,6 +37,8 @@ How to test:
 3. Click "Upload CSV"
 4. Select the CSV file
 5. View the analysis results instantly
+OR
+You can also load Sample Data
 
 ## CSV Format
 
