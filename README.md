@@ -26,6 +26,21 @@ The application helps factories prevent equipment failures, reduce unplanned dow
 - Maintenance Recommendations - AI-generated action items
 - Responsive Design - Works on desktop and mobile
 
+## Screenshots
+
+
+### ai-analysis
+![ai-analysis](screenshots/ai-analysis.png)
+
+### homepage
+![homepage](screenshots/homepage.png)
+
+### machine-health
+![machine-health](screenshots/machine-health.png)
+
+### sensor-health-breakdown
+![sensor-health-breakdown](screenshots/sensor-health-breakdown.png)
+
 ## Live Demo
 
 Access the live application:
